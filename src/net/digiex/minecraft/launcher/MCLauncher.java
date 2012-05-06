@@ -7,11 +7,6 @@ import net.digiex.minecraft.launcher.forms.LoginForm;
 public class MCLauncher {
 
 	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1571182324796731546L;
-
-	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
