@@ -3,8 +3,12 @@ package net.digiex.minecraft.launcher;
 import javax.swing.UIManager;
 
 import net.digiex.minecraft.launcher.forms.LoginForm;
+import net.digiex.minecraft.launcher.forms.MainForm;
 
 public class MCLauncher {
+	public static LoginForm loginForm;
+
+	public static MainForm mainForm;
 
 	/**
 	 * @param args
@@ -16,7 +20,8 @@ public class MCLauncher {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		(new LoginForm()).setVisible(true);
+		loginForm = new LoginForm();
+		loginForm.setVisible(true);
 	}
 
 }

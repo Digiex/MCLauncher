@@ -16,7 +16,7 @@ public class MainForm extends JFrame {
 	 */
 	private static final long serialVersionUID = -629514425150530096L;
 
-	public MainForm() {
+	public MainForm(String username, String sessionId) {
 		super("Digiex.net Minecraft Launcher");
 
 		this.setPreferredSize(new Dimension(854, 480));

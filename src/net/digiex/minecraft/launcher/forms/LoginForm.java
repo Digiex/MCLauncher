@@ -3,39 +3,68 @@ package net.digiex.minecraft.launcher.forms;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
+import net.digiex.minecraft.launcher.HTTPHelper;
 import net.digiex.minecraft.launcher.MCLauncher;
 import net.digiex.minecraft.launcher.gui.StatusBar;
 
 public class LoginForm extends JFrame implements ActionListener,
 		PropertyChangeListener {
-
 	class Task extends SwingWorker<Void, Void> {
+		private LoginForm loginForm;
+
+		public Task(LoginForm loginForm) {
+			this.loginForm = loginForm;
+		}
+
 		/*
 		 * Main task. Executed in background thread.
 		 */
 		@Override
 		public Void doInBackground() {
+			error = null;
 			// Initialize progress property.
 			setProgress(0);
-			// TODO: Add login logic here
+			try {
+				HTTPHelper helper = new HTTPHelper();
+				helper.setUrl(new URL("https://login.minecraft.net/"));
+				helper.addPostString("user", userNameBox.getText());
+				helper.addPostString("password",
+						new String(passwordBox.getPassword()));
+				helper.addPostString("version", "53");
+				String response = helper.getResponse();
+				if (response != null && response.length() > 0) {
+					if (!response.contains(":")) {
+						System.out.println("Error: " + response);
+						error = response;
+					} else {
+						String[] split = response.split(":");
+						userName = split[2];
+						sessionId = split[3];
+					}
+					System.out.println("Got " + response);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return null;
 		}
 
@@ -44,12 +73,25 @@ public class LoginForm extends JFrame implements ActionListener,
 		 */
 		@Override
 		public void done() {
-			Toolkit.getDefaultToolkit().beep();
 			loginButton.setEnabled(true);
 			setCursor(null); // turn off the wait cursor
-			statusBar.setMessage("Done!");
+			if (error == null) {
+				statusBar.setMessage("Done!");
+				MCLauncher.mainForm = new MainForm(userName, sessionId);
+				MCLauncher.mainForm.setVisible(true);
+				setVisible(false);
+				dispose();
+			} else {
+				statusBar.setMessage("Error: " + error);
+				JOptionPane.showMessageDialog(loginForm, error, "Error",
+						JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
+
+	private String error = null;
+	private String userName;
+	private String sessionId;
 
 	/**
 	 * 
@@ -101,7 +143,7 @@ public class LoginForm extends JFrame implements ActionListener,
 		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 		// Instances of javax.swing.SwingWorker are not reusuable, so
 		// we create new instances as needed.
-		loginTask = new Task();
+		loginTask = new Task(this);
 		loginTask.addPropertyChangeListener(this);
 		loginTask.execute();
 	}
