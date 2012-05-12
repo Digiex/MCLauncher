@@ -1,5 +1,7 @@
 package net.digiex.minecraft.launcher;
 
+import java.util.ArrayList;
+
 import javax.swing.UIManager;
 
 import net.digiex.minecraft.launcher.forms.LoginForm;
@@ -9,6 +11,8 @@ public class MCLauncher {
 	public static LoginForm loginForm;
 
 	public static MainForm mainForm;
+	public static String version = "2.0.0";
+	public static ArrayList<String> jarList = new ArrayList<String>();
 
 	/**
 	 * @param args
